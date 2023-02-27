@@ -1,5 +1,7 @@
 import aiohttp
 import random
+import requests
+import json
 
 class HubbleTg:
     """Взаимодействие с API телеграм бота"""
@@ -10,7 +12,12 @@ class HubbleTg:
         self.token = token
         self.update_id = 0
         self.session_id = self.get_session_id()
-    
+        
+        response = json.loads(requests.get(f'https://api.telegram.org/bot{token}/getMe').text)
+        self.bot_id = response['result']['id']
+        self.first_name = response['result']['first_name']
+        self.username = response['result']['username']
+        
     def get_session_id(self) -> str:
         """Генерирует session id"""
         
@@ -50,8 +57,9 @@ class HubbleTg:
             answer['description'] = str(error)
         return answer
     
-    async def send_message(self, text: str, chat_id: int, buttons: list = []) -> dict:
+    async def send_message(self, text: str, chat_id: int, buttons: list = [], drop_buttons: bool=True) -> dict:
         """Отправляет сообщение"""
+        
         answer = {
             'status_code': None,
             'description': None
@@ -67,15 +75,26 @@ class HubbleTg:
                 
             else:
                 payload = {
-                    'chat_id': chat_id,
-                    'text': text[:4095], 
-                    'reply_markup': {
-                        'remove_keyboard': True,
-                        'keyboard': [[{'text': text}] for text in buttons] if len(buttons) > 0 else [],
-                        'resize_keyboard': True,
-                        'one_time_keyboard': True
-                    }
+                    "chat_id": chat_id,
+                    "text": text[:4095]
                 }
+                
+                if buttons and len(buttons) != 0:
+                    payload["reply_markup"] = {
+                        "keyboard": [[{"text": text}] for text in buttons],
+                        "remove_keyboard": True,
+                        "resize_keyboard": True,
+                        "one_time_keyboard": False
+                    }
+                elif drop_buttons:
+                    payload["reply_markup"] = {
+                        "remove_keyboard": True
+                    }
+                else:
+                    payload["reply_markup"] = {
+                        "remove_keyboard": False
+                    }
+                    
                 async with aiohttp.ClientSession() as session:
                     async with session.post(f'https://api.telegram.org/bot{self.token}/sendMessage', json=payload) as resp:
                         answer['status_code'] = resp.status
