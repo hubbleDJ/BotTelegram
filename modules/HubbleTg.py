@@ -21,7 +21,9 @@ class HubbleTg:
     def get_session_id(self) -> str:
         """Генерирует session id"""
         
-        symbols = ['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+        symbols = ['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',\
+                   'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5',\
+                    '6', '7', '8', '9', '0']
         session_id = ''
         for i in range(0, 10):
             session_id += symbols[random.randint(0, len(symbols) - 1)]
