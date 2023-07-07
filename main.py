@@ -1,4 +1,4 @@
-import modules.hubbleTg as hubTg
+import modules.HubbleTg as hubTg
 import asyncio
 from config import TOKEN
 import multiprocessing
